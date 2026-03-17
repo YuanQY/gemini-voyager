@@ -5,7 +5,7 @@ The system SHALL provide a standalone folder management module for `notebooklm.g
 
 #### Scenario: Folder manager initialization
 - **WHEN** user visits `https://notebooklm.google.com/`
-- **THEN** the system MUST initialize `NotebookLMFolderManager` and inject the folder UI into the page
+- **THEN** the system MUST initialize `NotebookLMFolderManager` and establish a persistent `MutationObserver` to ensure the folder UI is injected and maintained across navigation.
 
 #### Scenario: Data isolation
 - **WHEN** user creates a folder on NotebookLM
@@ -23,7 +23,7 @@ The system SHALL support creating, renaming, deleting, and reordering folders wi
 
 #### Scenario: Create folder
 - **WHEN** user clicks the "Add Folder" button
-- **THEN** a new folder MUST be created, persisted to storage, and rendered in the folder list
+- **THEN** a new folder MUST be created, persisted to storage, and a full UI re-render MUST be triggered to update the folder list.
 
 #### Scenario: Delete folder
 - **WHEN** user deletes a folder

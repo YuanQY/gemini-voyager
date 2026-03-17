@@ -7302,3 +7302,67 @@ body.gv-rtl .timeline-preview-index {
   text-align: right;
   justify-content: flex-end;
 }
+
+/* =========================================================
+   NOTEBOOKLM FOLDER UI
+   ========================================================= */
+.gv-notebooklm-folder-container {
+  margin-bottom: 24px;
+}
+.gv-notebooklm-folder-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: rgba(128, 128, 128, 0.1);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.gv-notebooklm-folder-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+.gv-notebooklm-add-folder-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font-weight: 500;
+}
+.gv-notebooklm-add-folder-btn:hover {
+  opacity: 0.8;
+}
+.gv-dragging {
+  opacity: 0.5;
+}
+
+/* Floating fallback panel (when DOM injection point not found) */
+.gv-notebooklm-folder-floating {
+  position: fixed;
+  top: 80px;
+  left: 16px;
+  z-index: 10000;
+  width: 220px;
+  max-height: 60vh;
+  overflow-y: auto;
+  background: var(--gm3-sys-color-surface-container, #f0f4f9);
+  border: 1px solid var(--gm3-sys-color-outline-variant, #c4c7c5);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  font-family: 'Google Sans Text', 'Google Sans', Roboto, Arial, sans-serif;
+  font-size: 13px;
+  color: var(--gm3-sys-color-on-surface, #1f1f1f);
+}
+@media (prefers-color-scheme: dark) {
+  .gv-notebooklm-folder-floating {
+    background: var(--gm3-sys-color-surface-container, #1e1f20);
+    border-color: var(--gm3-sys-color-outline-variant, #444746);
+    color: var(--gm3-sys-color-on-surface, #e3e3e3);
+  }
+}
+.gv-notebooklm-folder-floating .gv-notebooklm-folder-list {
+  padding: 8px 4px;
+  color: var(--gm3-sys-color-on-surface-variant, #444746);
+  font-size: 12px;
+}

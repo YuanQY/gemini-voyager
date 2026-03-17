@@ -30,18 +30,30 @@ Both are independent classes that share the same `FolderData` type but have comp
 - **Why**: NotebookLM's DOM structure is unknown. Hard-coding selectors like `.notebook-grid` or `.notebook-card` without verification leads to brittle code.
 - **Implementation**: A prerequisite research task to document NotebookLM's actual DOM selectors, notebook ID extraction method, and layout structure.
 - **Rationale**: This information directly determines the implementation of ID extraction, container injection, and drag-and-drop logic.
+- **Outcome (Completed)**: NotebookLM uses Angular with the following confirmed DOM structure:
+  - **Root**: `<labs-tailwind-root>` → `<welcome-page>` → `.welcome-page-container` → `.all-projects-container`
+  - **Notebook list container**: `.my-projects-container` → `<project-grid>` → `.project-grid-container`
+  - **Each notebook card**: `<project-button class="project-button">` containing `<mat-card class="project-button-card">`
+  - **Notebook ID**: Embedded in child element IDs as `id="project-{uuid}-title"` (e.g., `project-83d27ed3-f142-4c4c-9018-29deb0c076dc-title`). Also available via `aria-labelledby` on the primary `<button>` inside each card.
+  - **Notebook title**: `<span class="project-button-title">` inside each `<project-button>`
+  - **Injection point**: Insert folder container before `<project-grid>` inside `.my-projects-container`
+  - **No `href` links** on notebook cards — navigation is handled via Angular router, not anchor tags.
 
 ### 3. Storage Isolation via Separate Key
 - **Why**: Consistent with how AI Studio uses `StorageKeys.FOLDER_DATA_AISTUDIO`.
 - **Implementation**: Add `StorageKeys.FOLDER_DATA_NOTEBOOKLM` (e.g., `gvFolderDataNotebookLM`) to `src/core/types/common.ts`.
 - **Alternatives**: Site-prefixed keys within a single namespace. (Rejected: current pattern is simpler and already proven.)
 
-### 4. Rendering Strategy: Determined by DOM Research
-- **Why**: NotebookLM may use a grid layout, list layout, or something else entirely. The rendering approach must be decided after DOM research, not before.
-- **Implementation**: Defer rendering design details to the DOM research outcome (Task 0).
+### 4. Rendering Strategy: Robust Rendering Engine & Persistent Observation
+- **Why**: NotebookLM is a single-page application built with Angular. Component re-renders and route navigation can silently remove extension-injected DOM elements. A one-time injection approach is brittle.
+- **Implementation**:
+  - **Full Render Loop**: Instead of static HTML strings, the manager uses a `render()` method that clears and rebuilds the folder UI from `this.data` whenever changes occur.
+  - **Persistent MutationObserver**: A global `MutationObserver` on `document.body` monitors for UI detachment or notebook list re-rendering. It automatically re-injects the folder UI and re-binds drag events if they are lost.
+  - **gv-bound Flag**: Uses a data attribute (`data-gv-bound`) on notebook cards to track event binding state and prevent duplicate listeners during observer triggers.
+- **Outcome**: Ensures the folder UI remains visible and functional across navigation and dynamic page updates.
 
 ## Risks / Trade-offs
 
-- **[Risk] DOM Changes in NotebookLM** → **Mitigation**: Use stable selectors (e.g., `[role]`, `[data-*]`) over class names where possible. Document selector choices for easy updates.
+- **[Risk] DOM Changes in NotebookLM** → **Mitigation**: Selectors used are Angular custom element names (`project-button`, `project-grid`) and stable CSS class names (`.my-projects-container`, `.project-grid-container`, `.project-button-title`). Notebook IDs are parsed from element `id` attributes following the pattern `project-{uuid}-{role}` — this is structurally tied to Angular's component identity and unlikely to change without major restructuring. All selector choices are documented for easy updates.
 - **[Risk] Code Duplication** → **Mitigation**: Acceptable for now. Common utilities (`validateFolderData`, `DataBackupService`, `FolderData` types) are already shared. A future consolidation pass can extract more shared logic once 3+ site implementations clarify the true common interface.
 - **[Trade-off] No Adapter Abstraction** → Simpler and safer now, but will require a separate refactoring effort if 4+ sites are needed.

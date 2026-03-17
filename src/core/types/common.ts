@@ -36,6 +36,7 @@ export const StorageKeys = {
   // Folder system
   FOLDER_DATA: 'gvFolderData',
   FOLDER_DATA_AISTUDIO: 'gvFolderDataAIStudio',
+  FOLDER_DATA_NOTEBOOKLM: 'gvFolderDataNotebookLM',
 
   // Timeline
   TIMELINE_SCROLL_MODE: 'geminiTimelineScrollMode',

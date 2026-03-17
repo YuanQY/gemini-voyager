@@ -18,6 +18,7 @@ import { startExportButton } from './export/index';
 import { startAIStudioFolderManager } from './folder/aistudio';
 import { startFolderManager } from './folder/index';
 import { startFolderSpacingAdjuster } from './folderSpacing/index';
+import { startNotebookLMFolderManager } from './folder/notebooklm';
 import { isForkFeatureEnabledValue } from './fork/featureFlag';
 import { startFork } from './fork/index';
 import { startGemsHider } from './gemsHider/index';
@@ -306,6 +307,11 @@ async function initializeFeatures(): Promise<void> {
       startFormulaCopy();
       await delay(LIGHT_FEATURE_INIT_DELAY);
     }
+
+    if (location.hostname === 'notebooklm.google.com') {
+      startNotebookLMFolderManager();
+      await delay(HEAVY_FEATURE_INIT_DELAY);
+    }
   } catch (e) {
     if (isExtensionContextInvalidatedError(e)) {
       return;
@@ -400,7 +406,8 @@ function handleVisibilityChange(): void {
       hostname.includes('gemini.google.com') ||
       hostname.includes('business.gemini.google') ||
       hostname.includes('aistudio.google.com') ||
-      hostname.includes('aistudio.google.cn');
+      hostname.includes('aistudio.google.cn') ||
+      hostname.includes('notebooklm.google.com');
 
     // Initialize KaTeX configuration early to suppress Unicode warnings
     // This must run before any formulas are rendered on the page
