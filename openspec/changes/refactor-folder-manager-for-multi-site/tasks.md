@@ -60,6 +60,9 @@
   - Include: full render loop generating folder and reference elements.
   - **Verify**: Visual check that UI updates immediately on data change.
 
+- [x] 4.4 Synchronize notebook icons — extract from `.project-button-box-icon` and persist in folder references.
+  - **Verify**: Folder items display the correct emoji matching the notebook card.
+
 ## 5. Folder CRUD Operations
 
 - [x] 5.1 Implement `createFolder()`, `renameFolder()`, `deleteFolder()`.

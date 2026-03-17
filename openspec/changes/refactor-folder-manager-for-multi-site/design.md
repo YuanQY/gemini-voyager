@@ -35,6 +35,7 @@ Both are independent classes that share the same `FolderData` type but have comp
   - **Notebook list container**: `.my-projects-container` → `<project-grid>` → `.project-grid-container`
   - **Each notebook card**: `<project-button class="project-button">` containing `<mat-card class="project-button-card">`
   - **Notebook ID**: Embedded in child element IDs as `id="project-{uuid}-title"` (e.g., `project-83d27ed3-f142-4c4c-9018-29deb0c076dc-title`). Also available via `aria-labelledby` on the primary `<button>` inside each card.
+  - **Notebook Icon**: Extracted from `.project-button-box-icon` and synchronized to the folder reference.
   - **Notebook title**: `<span class="project-button-title">` inside each `<project-button>`
   - **Injection point**: Insert folder container before `<project-grid>` inside `.my-projects-container`
   - **No `href` links** on notebook cards — navigation is handled via Angular router, not anchor tags.

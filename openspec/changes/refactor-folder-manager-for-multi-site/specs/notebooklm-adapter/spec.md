@@ -18,6 +18,10 @@ The system SHALL extract unique identifiers for notebooks from their DOM element
 - **WHEN** a notebook element is rendered on the page
 - **THEN** the manager MUST extract a stable unique ID from the element's attributes or child links
 
+#### Scenario: Extract notebook icon
+- **WHEN** a notebook is added to a folder
+- **THEN** the system MUST extract the notebook's icon (e.g., emoji from `.project-button-box-icon`) and persist it to display consistent iconography in the folder list
+
 ### Requirement: Folder CRUD
 The system SHALL support creating, renaming, deleting, and reordering folders within the NotebookLM folder UI.
 
