@@ -23,6 +23,9 @@ export class NotebookLMFolderManager {
   private readonly STORAGE_KEY = StorageKeys.FOLDER_DATA_NOTEBOOKLM;
   private backupService!: DataBackupService<FolderData>;
   private observer: MutationObserver | null = null;
+  private activeColorPicker: HTMLElement | null = null;
+  private activeColorPickerFolderId: string | null = null;
+  private activeColorPickerCloseHandler: ((e: MouseEvent) => void) | null = null;
 
   async init(): Promise<void> {
     console.log('[NotebookLMFolderManager] Starting robust init...');
@@ -153,20 +156,39 @@ export class NotebookLMFolderManager {
     // Sort folders by creation time
     const sortedFolders = [...this.data.folders].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 
-    sortedFolders.forEach(folder => {
-      const folderEl = this.createFolderElement(folder);
+    // Separate pinned and unpinned folders
+    const pinnedFolders = sortedFolders.filter(f => f.pinned && f.parentId === null);
+    const regularFolders = sortedFolders.filter(f => !f.pinned && f.parentId === null);
+
+    pinnedFolders.forEach(folder => {
+      const folderEl = this.createFolderElement(folder, 0);
+      this.listElement?.appendChild(folderEl);
+    });
+
+    if (pinnedFolders.length > 0 && regularFolders.length > 0) {
+      const separator = document.createElement('div');
+      separator.className = 'gv-folder-separator';
+      this.listElement.appendChild(separator);
+    }
+
+    regularFolders.forEach(folder => {
+      const folderEl = this.createFolderElement(folder, 0);
       this.listElement?.appendChild(folderEl);
     });
   }
 
-  private createFolderElement(folder: Folder): HTMLElement {
+  private createFolderElement(folder: Folder, level: number): HTMLElement {
     const el = document.createElement('div');
-    el.className = `gv-folder-item ${folder.isExpanded ? 'is-expanded' : ''}`;
+    el.className = `gv-folder-item ${folder.isExpanded ? 'is-expanded' : ''} ${folder.pinned ? 'is-pinned' : ''}`;
     el.dataset.id = folder.id;
+    el.style.setProperty('--folder-level', level.toString());
 
     // Header
     const header = document.createElement('div');
     header.className = 'gv-folder-header';
+    if (folder.color) {
+      header.style.borderLeft = `3px solid ${this.getFolderColorValue(folder.color)}`;
+    }
     
     const toggleBtn = document.createElement('span');
     toggleBtn.className = 'gv-folder-toggle';
@@ -178,25 +200,24 @@ export class NotebookLMFolderManager {
 
     const name = document.createElement('span');
     name.className = 'gv-folder-name';
-    name.textContent = folder.name;
+    name.textContent = `${folder.pinned ? '📌 ' : ''}${folder.name}`;
     name.ondblclick = () => this.handleRenameFolder(folder.id, folder.name);
 
     const actions = document.createElement('div');
     actions.className = 'gv-folder-actions';
     
-    const delBtn = document.createElement('button');
-    delBtn.className = 'gv-folder-del-btn';
-    delBtn.innerHTML = '🗑️';
-    delBtn.title = this.t('folder_delete');
-    delBtn.onclick = (e) => {
+    const menuBtn = document.createElement('button');
+    menuBtn.className = 'gv-folder-menu-btn';
+    menuBtn.innerHTML = '⋮';
+    menuBtn.onclick = (e) => {
       e.stopPropagation();
-      this.handleDeleteFolder(folder.id);
+      this.showFolderMenu(e, folder.id);
     };
 
     header.appendChild(toggleBtn);
     header.appendChild(name);
     header.appendChild(actions);
-    actions.appendChild(delBtn);
+    actions.appendChild(menuBtn);
 
     // Context drop zone
     header.addEventListener('dragover', (e) => {
@@ -221,9 +242,19 @@ export class NotebookLMFolderManager {
       const content = document.createElement('div');
       content.className = 'gv-folder-content';
       
+      // Render Subfolders
+      const subfolders = this.data.folders
+        .filter(f => f.parentId === folder.id)
+        .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+      
+      subfolders.forEach((sub: Folder) => {
+        content.appendChild(this.createFolderElement(sub, level + 1));
+      });
+
+      // Render Notebooks
       const items = this.data.folderContents[folder.id] || [];
-      if (items.length === 0) {
-        content.innerHTML = `<div class="gv-empty-folder">${this.t('folder_empty_hint') || 'Drag notebooks here'}</div>`;
+      if (items.length === 0 && subfolders.length === 0) {
+        content.innerHTML += `<div class="gv-empty-folder">${this.t('folder_empty_hint') || 'Drag notebooks here'}</div>`;
       } else {
         items.forEach(item => {
           const itemEl = this.createNotebookRefElement(folder.id, item);
@@ -291,6 +322,120 @@ export class NotebookLMFolderManager {
       await this.deleteFolder(id);
       this.render();
     }
+  }
+
+  private showFolderMenu(event: MouseEvent, folderId: string): void {
+    const folder = this.data.folders.find((f) => f.id === folderId);
+    if (!folder) return;
+
+    const menu = document.createElement('div');
+    menu.className = 'gv-folder-menu';
+    menu.style.position = 'fixed';
+    menu.style.left = `${event.clientX}px`;
+    menu.style.top = `${event.clientY}px`;
+
+    const menuItems = [
+      {
+        label: folder.pinned ? this.t('folder_unpin') : this.t('folder_pin'),
+        action: () => this.togglePinFolder(folderId),
+      },
+      { label: this.t('folder_create_subfolder'), action: () => this.handleCreateSubfolder(folderId) },
+      { label: this.t('folder_rename'), action: () => this.handleRenameFolder(folderId, folder.name) },
+      { label: this.t('folder_change_color'), action: () => this.showColorPicker(folderId, event) },
+      { label: this.t('folder_delete'), action: () => this.handleDeleteFolder(folderId) },
+    ];
+
+    menuItems.forEach((item) => {
+      const menuItem = document.createElement('button');
+      menuItem.className = 'gv-folder-menu-item';
+      menuItem.textContent = item.label;
+      menuItem.addEventListener('click', () => {
+        item.action();
+        menu.remove();
+      });
+      menu.appendChild(menuItem);
+    });
+
+    document.body.appendChild(menu);
+
+    const closeMenu = (e: MouseEvent) => {
+      if (!menu.contains(e.target as Node)) {
+        menu.remove();
+        document.removeEventListener('click', closeMenu);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', closeMenu), 0);
+  }
+
+  private async handleCreateSubfolder(parentId: string) {
+    const name = prompt(this.t('folder_name_prompt') || 'Enter subfolder name:');
+    if (name) {
+      await this.createFolder(name, parentId);
+      this.render();
+    }
+  }
+
+  private showColorPicker(folderId: string, event: MouseEvent): void {
+    if (this.activeColorPicker) {
+      this.activeColorPicker.remove();
+      if (this.activeColorPickerCloseHandler) {
+        document.removeEventListener('click', this.activeColorPickerCloseHandler);
+      }
+    }
+
+    const dialog = document.createElement('div');
+    dialog.className = 'gv-color-picker-dialog';
+    dialog.style.position = 'fixed';
+    dialog.style.left = `${event.clientX + 10}px`;
+    dialog.style.top = `${event.clientY}px`;
+    dialog.style.zIndex = '10001';
+
+    const colors = [
+      { id: 'default', color: '#6b7280' },
+      { id: 'red', color: '#ef4444' },
+      { id: 'orange', color: '#f97316' },
+      { id: 'yellow', color: '#eab308' },
+      { id: 'green', color: '#22c55e' },
+      { id: 'blue', color: '#3b82f6' },
+      { id: 'purple', color: '#a855f7' },
+    ];
+
+    colors.forEach(c => {
+      const btn = document.createElement('button');
+      btn.className = 'gv-color-picker-item';
+      btn.style.backgroundColor = c.color;
+      btn.onclick = async () => {
+        await this.setFolderColor(folderId, c.id);
+        dialog.remove();
+        this.render();
+      };
+      dialog.appendChild(btn);
+    });
+
+    document.body.appendChild(dialog);
+    this.activeColorPicker = dialog;
+
+    this.activeColorPickerCloseHandler = (e: MouseEvent) => {
+      if (!dialog.contains(e.target as Node)) {
+        dialog.remove();
+        document.removeEventListener('click', this.activeColorPickerCloseHandler!);
+        this.activeColorPicker = null;
+      }
+    };
+    setTimeout(() => document.addEventListener('click', this.activeColorPickerCloseHandler!), 0);
+  }
+
+  private getFolderColorValue(colorId: string): string {
+    const colors: Record<string, string> = {
+      default: '#6b7280',
+      red: '#ef4444',
+      orange: '#f97316',
+      yellow: '#eab308',
+      green: '#22c55e',
+      blue: '#3b82f6',
+      purple: '#a855f7',
+    };
+    return colors[colorId] || colors.default;
   }
 
   /**
@@ -382,14 +527,15 @@ export class NotebookLMFolderManager {
     } catch { return false; }
   }
 
-  async createFolder(name: string): Promise<void> {
+  async createFolder(name: string, parentId: string | null = null): Promise<void> {
     const newFolder: Folder = {
       id: crypto.randomUUID() as FolderId,
       name: name.trim() || 'New Folder',
-      parentId: null,
+      parentId: parentId as FolderId | null,
       isExpanded: true,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      pinned: false,
     };
     this.data.folders.push(newFolder);
     this.data.folderContents[newFolder.id] = [];
@@ -428,6 +574,23 @@ export class NotebookLMFolderManager {
     }
   }
 
+  async togglePinFolder(id: string): Promise<void> {
+    const folder = this.data.folders.find(f => f.id === id);
+    if (folder) {
+      folder.pinned = !folder.pinned;
+      await this.save();
+      this.render();
+    }
+  }
+
+  async setFolderColor(id: string, color: string): Promise<void> {
+    const folder = this.data.folders.find(f => f.id === id);
+    if (folder) {
+      folder.color = color;
+      await this.save();
+    }
+  }
+
   async load(): Promise<void> {
     const result = await chrome.storage.local.get(this.STORAGE_KEY);
     const data = result[this.STORAGE_KEY];
@@ -445,6 +608,136 @@ export class NotebookLMFolderManager {
     if (this.observer) this.observer.disconnect();
     if (this.container) this.container.remove();
   }
+}
+
+
+// Styles for NotebookLM Folder UI
+const styles = `
+  .gv-notebooklm-folder-container {
+    margin: 20px 0;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+  }
+  .gv-notebooklm-folder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .gv-notebooklm-folder-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: #3c4043;
+  }
+  .gv-notebooklm-add-folder-btn {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .gv-folder-item {
+    margin-bottom: 4px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .gv-folder-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: white;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    margin-left: calc(var(--folder-level, 0) * 16px);
+  }
+  .gv-folder-header:hover {
+    background: #f1f3f4;
+  }
+  .gv-folder-header.gv-drag-over {
+    background: #e8f0fe;
+    border: 1px dashed #1a73e8;
+  }
+  .gv-folder-toggle {
+    margin-right: 8px;
+    font-size: 10px;
+    color: #5f6368;
+    width: 14px;
+  }
+  .gv-folder-name {
+    flex: 1;
+    font-size: 14px;
+    color: #3c4043;
+  }
+  .gv-folder-actions {
+    display: flex;
+    gap: 4px;
+  }
+  .gv-folder-menu-btn {
+    background: transparent;
+    border: none;
+    color: #5f6368;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .gv-folder-menu-btn:hover {
+    background: #dadce0;
+  }
+  .gv-folder-content {
+    margin-top: 2px;
+  }
+  .gv-notebook-ref {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px 6px calc((var(--folder-level, 0) + 1) * 16px + 12px);
+    gap: 8px;
+    transition: background 0.2s;
+  }
+  .gv-notebook-ref:hover {
+    background: #f1f3f4;
+  }
+  .gv-ref-title {
+    flex: 1;
+    font-size: 13px;
+    color: #1a73e8;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .gv-ref-remove {
+    opacity: 0;
+    background: transparent;
+    border: none;
+    color: #5f6368;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .gv-notebook-ref:hover .gv-ref-remove {
+    opacity: 1;
+  }
+  .gv-folder-separator {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 8px 0;
+  }
+  .gv-empty-folder, .gv-empty-state {
+    font-size: 12px;
+    color: #80868b;
+    padding: 8px 12px;
+    font-style: italic;
+  }
+`;
+
+if (typeof document !== 'undefined') {
+  const styleEl = document.createElement('style');
+  styleEl.textContent = styles;
+  document.head.appendChild(styleEl);
 }
 
 export async function startNotebookLMFolderManager(): Promise<NotebookLMFolderManager> {

@@ -22,6 +22,19 @@ The system SHALL extract unique identifiers for notebooks from their DOM element
 - **WHEN** a notebook is added to a folder
 - **THEN** the system MUST extract the notebook's icon (e.g., emoji from `.project-button-box-icon`) and persist it to display consistent iconography in the folder list
 
+### Requirement: Folder Context Menu
+The system SHALL provide a context menu for each folder containing the following actions:
+- **Unpin/Pin folder**: Toggle folder pinning status.
+- **Create subfolder**: Create a new folder nested inside the current folder.
+- **Rename**: Prompt for a new folder name.
+- **Change Color**: Allow selecting a semantic color for the folder.
+- **Delete**: Remove the folder and its contents.
+
+### Requirement: Folder Nesting
+The system SHALL support multi-level folder hierarchy (nested folders).
+- Subfolders MUST be rendered with appropriate indentation within their parent folder.
+- Dropping a notebook into a subfolder MUST correctly associate it with that subfolder.
+
 ### Requirement: Folder CRUD
 The system SHALL support creating, renaming, deleting, and reordering folders within the NotebookLM folder UI.
 
