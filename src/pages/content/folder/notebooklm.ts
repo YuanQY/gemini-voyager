@@ -44,10 +44,10 @@ export class NotebookLMFolderManager {
     if (location.hostname !== 'notebooklm.google.com') return;
 
     await this.load();
-    
+
     // Start persistent observer to ensure UI is injected and notebooks are draggable
     this.setupPersistentObserver();
-    
+
     console.log('[NotebookLMFolderManager] Persistent observer started');
   }
 
@@ -61,9 +61,9 @@ export class NotebookLMFolderManager {
       this.refreshUI();
     });
 
-    this.observer.observe(document.body, { 
-      childList: true, 
-      subtree: true 
+    this.observer.observe(document.body, {
+      childList: true,
+      subtree: true
     });
 
     // Initial trigger
@@ -103,25 +103,25 @@ export class NotebookLMFolderManager {
     if (!this.container) {
       this.container = document.createElement('div');
       this.container.className = 'gv-notebooklm-folder-container';
-      
+
       const header = document.createElement('div');
       header.className = 'gv-notebooklm-folder-header';
-      
+
       const title = document.createElement('div');
       title.className = 'gv-notebooklm-folder-title';
       title.innerHTML = `📁 ${this.t('folder_title') || 'Folders'}`;
-      
+
       const addBtn = document.createElement('button');
       addBtn.className = 'gv-notebooklm-add-folder-btn';
       addBtn.textContent = `+ ${this.t('folder_create') || 'New'}`;
       addBtn.onclick = () => this.handleCreateFolder();
-      
+
       header.appendChild(title);
       header.appendChild(addBtn);
-      
+
       this.listElement = document.createElement('div');
       this.listElement.className = 'gv-notebooklm-folder-list';
-      
+
       this.container.appendChild(header);
       this.container.appendChild(this.listElement);
     }
@@ -189,7 +189,7 @@ export class NotebookLMFolderManager {
     if (folder.color) {
       header.style.borderLeft = `3px solid ${this.getFolderColorValue(folder.color)}`;
     }
-    
+
     const toggleBtn = document.createElement('span');
     toggleBtn.className = 'gv-folder-toggle';
     toggleBtn.textContent = folder.isExpanded ? '▼' : '▶';
@@ -205,7 +205,7 @@ export class NotebookLMFolderManager {
 
     const actions = document.createElement('div');
     actions.className = 'gv-folder-actions';
-    
+
     const menuBtn = document.createElement('button');
     menuBtn.className = 'gv-folder-menu-btn';
     menuBtn.innerHTML = '⋮';
@@ -241,12 +241,12 @@ export class NotebookLMFolderManager {
     if (folder.isExpanded) {
       const content = document.createElement('div');
       content.className = 'gv-folder-content';
-      
+
       // Render Subfolders
       const subfolders = this.data.folders
         .filter(f => f.parentId === folder.id)
         .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-      
+
       subfolders.forEach((sub: Folder) => {
         content.appendChild(this.createFolderElement(sub, level + 1));
       });
@@ -270,10 +270,10 @@ export class NotebookLMFolderManager {
   private createNotebookRefElement(folderId: string, ref: ConversationReference): HTMLElement {
     const el = document.createElement('div');
     el.className = 'gv-notebook-ref';
-    
+
     const icon = document.createElement('span');
     icon.textContent = ref.icon || '📓';
-    
+
     const title = document.createElement('a');
     title.className = 'gv-ref-title';
     title.textContent = ref.title;
@@ -294,7 +294,7 @@ export class NotebookLMFolderManager {
     el.appendChild(icon);
     el.appendChild(title);
     el.appendChild(removeBtn);
-    
+
     return el;
   }
 
@@ -445,10 +445,10 @@ export class NotebookLMFolderManager {
     const cards = container.querySelectorAll<HTMLElement>('project-button');
     cards.forEach(card => {
       if (card.dataset.gvBound) return;
-      
+
       const id = this.extractNotebookId(card);
       if (!id) return;
-      
+
       const titleEl = card.querySelector('.project-button-title');
       const title = titleEl ? (titleEl.textContent || '').trim() : 'Unknown';
       const url = `${window.location.origin}/notebook/${id}`;
@@ -459,7 +459,7 @@ export class NotebookLMFolderManager {
 
       card.setAttribute('draggable', 'true');
       card.dataset.gvBound = 'true';
-      
+
       card.addEventListener('dragstart', (e) => {
         if (!e.dataTransfer) return;
         const dragData: ConversationDragData = {
@@ -510,7 +510,7 @@ export class NotebookLMFolderManager {
 
       const notebookId = parsedData.conversationId;
       if (!this.data.folderContents[folderId]) this.data.folderContents[folderId] = [];
-      
+
       const list = this.data.folderContents[folderId];
       if (list.some(item => item.conversationId === notebookId)) return false;
 
