@@ -241,7 +241,7 @@ export class NotebookLMFolderManager {
     el.className = 'gv-notebook-ref';
     
     const icon = document.createElement('span');
-    icon.textContent = '📓';
+    icon.textContent = ref.icon || '📓';
     
     const title = document.createElement('a');
     title.className = 'gv-ref-title';
@@ -308,6 +308,10 @@ export class NotebookLMFolderManager {
       const title = titleEl ? (titleEl.textContent || '').trim() : 'Unknown';
       const url = `${window.location.origin}/notebook/${id}`;
 
+      // Extract icon/emoji from card
+      const iconEl = card.querySelector('.project-button-box-icon');
+      const icon = iconEl ? (iconEl.textContent || '').trim() : undefined;
+
       card.setAttribute('draggable', 'true');
       card.dataset.gvBound = 'true';
       
@@ -318,6 +322,7 @@ export class NotebookLMFolderManager {
           conversationId: id as ConversationId,
           title,
           url,
+          icon,
         };
         e.dataTransfer.setData('application/json', JSON.stringify(dragData));
         e.dataTransfer.effectAllowed = 'move';
@@ -368,6 +373,7 @@ export class NotebookLMFolderManager {
         conversationId: notebookId as ConversationId,
         title: parsedData.title || 'Unknown',
         url: parsedData.url || '',
+        icon: parsedData.icon,
         addedAt: Date.now()
       });
 

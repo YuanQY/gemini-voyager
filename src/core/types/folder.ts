@@ -28,6 +28,7 @@ export interface ConversationReference {
   starred?: boolean; // Whether this conversation is starred in the folder
   customTitle?: boolean; // Whether title was manually renamed in folder (don't auto-sync from native)
   sortIndex?: number;
+  icon?: string; // Icon or emoji for the conversation
 }
 
 export interface FolderData {
@@ -49,6 +50,7 @@ export interface ConversationDragData extends BaseDragData {
   isGem?: boolean;
   gemId?: string;
   sourceFolderId?: FolderId;
+  icon?: string;
 }
 
 export interface FolderDragData extends BaseDragData {
