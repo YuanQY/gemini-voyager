@@ -65,10 +65,10 @@
 
 ## 5. Folder CRUD Operations
 
-- [ ] 5.1 Implement `createFolder()`, `renameFolder()`, `deleteFolder()`.
-- [ ] 5.2 Implement folder context menu with actions: Create Subfolder, Rename, Change Color, Delete.
-- [ ] 5.3 Implement UI for nested folder rendering and indentation.
-- [ ] 5.4 Implement folder pinning logic and UI indicator.
+- [x] 5.1 Implement `createFolder()`, `renameFolder()`, `deleteFolder()`.
+- [x] 5.2 Implement folder context menu with actions: Create Subfolder, Rename, Change Color, Delete.
+- [x] 5.3 Implement UI for nested folder rendering and indentation.
+- [x] 5.4 Implement folder pinning logic and UI indicator.
   - Follow the same UX pattern as `AIStudioFolderManager` (inline rename, confirm dialog for delete).
   - **Verify**: Unit tests for each operation verifying `this.data` state mutations and `save()` calls.
 
