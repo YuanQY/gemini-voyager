@@ -18,8 +18,9 @@ export type SyncMode = 'disabled' | 'manual' | 'auto';
  * Platform identifier for sync operations
  * - gemini: Main Gemini website (gemini.google.com)
  * - aistudio: AI Studio website (aistudio.google.com, aistudio.google.cn)
+ * - notebooklm: NotebookLM website (notebooklm.google.com)
  */
-export type SyncPlatform = 'gemini' | 'aistudio';
+export type SyncPlatform = 'gemini' | 'aistudio' | 'notebooklm';
 
 export interface SyncAccountScope {
   accountKey: string;
@@ -41,6 +42,10 @@ export interface SyncState {
   lastSyncTimeAIStudio: number | null;
   /** Timestamp of last successful upload for AI Studio */
   lastUploadTimeAIStudio: number | null;
+  /** Timestamp of last successful sync/download for NotebookLM */
+  lastSyncTimeNotebookLM: number | null;
+  /** Timestamp of last successful upload for NotebookLM */
+  lastUploadTimeNotebookLM: number | null;
   /** Whether a sync operation is currently in progress */
   isSyncing: boolean;
   /** Last error message (null if no error) */
@@ -151,6 +156,8 @@ export const DEFAULT_SYNC_STATE: SyncState = {
   lastUploadTime: null,
   lastSyncTimeAIStudio: null,
   lastUploadTimeAIStudio: null,
+  lastSyncTimeNotebookLM: null,
+  lastUploadTimeNotebookLM: null,
   isSyncing: false,
   error: null,
   isAuthenticated: false,

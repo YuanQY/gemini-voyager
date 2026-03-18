@@ -968,6 +968,9 @@ export class FolderManager {
         ) as HTMLElement;
         if (el) el.style.opacity = '0.5';
       });
+
+      // Set a small drag image to prevent obscuring targets
+      this.setSmallDragImage(e as DragEvent, displayTitle);
     });
 
     convEl.addEventListener('dragend', () => {
@@ -1114,6 +1117,14 @@ export class FolderManager {
   }
 
   private setupDropZone(element: HTMLElement, folderId: string): void {
+    let dragCounter = 0;
+    element.addEventListener('dragenter', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dragCounter++;
+      element.classList.add('gv-folder-dragover');
+    });
+
     element.addEventListener('dragover', (e) => {
       e.preventDefault();
       e.stopPropagation(); // Prevent root drop zone from also highlighting
@@ -1122,12 +1133,9 @@ export class FolderManager {
     });
 
     element.addEventListener('dragleave', (e) => {
-      // Only remove highlight when cursor truly leaves the element (not just entering a child)
-      const rect = element.getBoundingClientRect();
-      const x = (e as DragEvent).clientX;
-      const y = (e as DragEvent).clientY;
-
-      if (x <= rect.left || x >= rect.right || y <= rect.top || y >= rect.bottom) {
+      e.stopPropagation();
+      dragCounter--;
+      if (dragCounter <= 0) {
         element.classList.remove('gv-folder-dragover');
       }
     });
@@ -1597,6 +1605,33 @@ export class FolderManager {
     }
 
     return null;
+  }
+
+  private setSmallDragImage(e: DragEvent, title: string): void {
+    if (!e.dataTransfer) return;
+
+    const ghost = document.createElement('div');
+    ghost.style.cssText = `
+      position: fixed;
+      left: -1000px;
+      top: -1000px;
+      padding: 8px 12px;
+      background: var(--gem-sys-color-surface-container, #e8f0fe);
+      color: var(--gem-sys-color-on-surface, #1a73e8);
+      border: 1px solid var(--gem-sys-color-outline, #1a73e8);
+      border-radius: 8px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: -1;
+      pointer-events: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    `;
+    ghost.innerHTML = `<span>📂</span> <span>${title}</span>`;
+    document.body.appendChild(ghost);
+    e.dataTransfer.setDragImage(ghost, 10, 10);
+    setTimeout(() => ghost.remove(), 0);
   }
 
   private extractConversationId(element: HTMLElement): string {

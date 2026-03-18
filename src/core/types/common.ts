@@ -75,6 +75,7 @@ export const StorageKeys = {
   GV_ACCOUNT_ISOLATION_ENABLED: 'gvAccountIsolationEnabled',
   GV_ACCOUNT_ISOLATION_ENABLED_GEMINI: 'gvAccountIsolationEnabledGemini',
   GV_ACCOUNT_ISOLATION_ENABLED_AISTUDIO: 'gvAccountIsolationEnabledAIStudio',
+  GV_ACCOUNT_ISOLATION_ENABLED_NOTEBOOKLM: 'gvAccountIsolationEnabledNotebookLM',
   GV_ACCOUNT_PROFILE_MAP: 'gvAccountProfileMap',
 
   // Sidebar behavior

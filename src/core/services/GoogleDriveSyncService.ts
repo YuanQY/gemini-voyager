@@ -32,6 +32,7 @@ const AISTUDIO_FOLDERS_FILE_NAME = 'gemini-voyager-aistudio-folders.json';
 const PROMPTS_FILE_NAME = 'gemini-voyager-prompts.json';
 const STARRED_FILE_NAME = 'gemini-voyager-starred.json';
 const FORKS_FILE_NAME = 'gemini-voyager-forks.json';
+const NOTEBOOKLM_FOLDERS_FILE_NAME = 'gemini-voyager-notebooklm-folders.json';
 const BACKUP_FOLDER_NAME = 'Gemini Voyager Data';
 const DRIVE_API_BASE = 'https://www.googleapis.com/drive/v3';
 const DRIVE_UPLOAD_BASE = 'https://www.googleapis.com/upload/drive/v3';
@@ -52,6 +53,7 @@ export class GoogleDriveSyncService {
   private promptsFileId: string | null = null;
   private starredFileId: string | null = null;
   private forksFileId: string | null = null;
+  private notebooklmFoldersFileId: string | null = null;
   private backupFolderId: string | null = null;
   private fileIdByName: Record<string, string> = {};
   private stateChangeCallback: ((state: SyncState) => void) | null = null;
@@ -177,9 +179,18 @@ export class GoogleDriveSyncService {
 
       // Upload folders file (platform-specific)
       const foldersBaseFileName =
-        platform === 'aistudio' ? AISTUDIO_FOLDERS_FILE_NAME : FOLDERS_FILE_NAME;
+        platform === 'aistudio'
+          ? AISTUDIO_FOLDERS_FILE_NAME
+          : platform === 'notebooklm'
+            ? NOTEBOOKLM_FOLDERS_FILE_NAME
+            : FOLDERS_FILE_NAME;
       const foldersFileName = this.getFileNameForScope(foldersBaseFileName, accountScope);
-      const foldersType = platform === 'aistudio' ? 'aistudio-folders' : 'folders';
+      const foldersType =
+        platform === 'aistudio'
+          ? 'aistudio-folders'
+          : platform === 'notebooklm'
+            ? 'notebooklm-folders'
+            : 'folders';
       const foldersFileIdToUse = await this.ensureFileId(token, foldersFileName, foldersType);
       await this.uploadFileWithRetry(token, foldersFileIdToUse, folderPayload);
       console.log(`[GoogleDriveSyncService] ${platform} folders uploaded successfully`);
@@ -241,6 +252,8 @@ export class GoogleDriveSyncService {
       // Update platform-specific upload time
       if (platform === 'aistudio') {
         this.updateState({ isSyncing: false, lastUploadTimeAIStudio: uploadTime, error: null });
+      } else if (platform === 'notebooklm') {
+        this.updateState({ isSyncing: false, lastUploadTimeNotebookLM: uploadTime, error: null });
       } else {
         this.updateState({ isSyncing: false, lastUploadTime: uploadTime, error: null });
       }
@@ -292,7 +305,11 @@ export class GoogleDriveSyncService {
 
       // Download folders file (platform-specific)
       const foldersBaseFileName =
-        platform === 'aistudio' ? AISTUDIO_FOLDERS_FILE_NAME : FOLDERS_FILE_NAME;
+        platform === 'aistudio'
+          ? AISTUDIO_FOLDERS_FILE_NAME
+          : platform === 'notebooklm'
+            ? NOTEBOOKLM_FOLDERS_FILE_NAME
+            : FOLDERS_FILE_NAME;
       const foldersFileId = await this.findFileForScope(token, foldersBaseFileName, accountScope);
       let folders: FolderExportPayload | null = null;
       if (foldersFileId) {
@@ -610,7 +627,7 @@ export class GoogleDriveSyncService {
   private async ensureFileId(
     token: string,
     fileName: string,
-    type: 'folders' | 'aistudio-folders' | 'prompts' | 'starred' | 'forks',
+    type: 'folders' | 'aistudio-folders' | 'notebooklm-folders' | 'prompts' | 'starred' | 'forks',
   ): Promise<string> {
     // 1. Ensure backup folder exists
     const folderId = await this.ensureBackupFolder(token);
@@ -657,7 +674,7 @@ export class GoogleDriveSyncService {
   }
 
   private setFileIdForType(
-    type: 'folders' | 'aistudio-folders' | 'prompts' | 'starred' | 'forks',
+    type: 'folders' | 'aistudio-folders' | 'notebooklm-folders' | 'prompts' | 'starred' | 'forks',
     fileId: string,
   ): void {
     switch (type) {
@@ -666,6 +683,9 @@ export class GoogleDriveSyncService {
         break;
       case 'aistudio-folders':
         this.aistudioFoldersFileId = fileId;
+        break;
+      case 'notebooklm-folders':
+        this.notebooklmFoldersFileId = fileId;
         break;
       case 'prompts':
         this.promptsFileId = fileId;
@@ -843,6 +863,8 @@ export class GoogleDriveSyncService {
         'gvLastUploadTime',
         'gvLastSyncTimeAIStudio',
         'gvLastUploadTimeAIStudio',
+        'gvLastSyncTimeNotebookLM',
+        'gvLastUploadTimeNotebookLM',
         'gvSyncError',
       ]);
       this.state = {
@@ -851,9 +873,11 @@ export class GoogleDriveSyncService {
         lastUploadTime: result.gvLastUploadTime || null,
         lastSyncTimeAIStudio: result.gvLastSyncTimeAIStudio || null,
         lastUploadTimeAIStudio: result.gvLastUploadTimeAIStudio || null,
+        lastSyncTimeNotebookLM: result.gvLastSyncTimeNotebookLM || null,
+        lastUploadTimeNotebookLM: result.gvLastUploadTimeNotebookLM || null,
         error: result.gvSyncError || null,
         isSyncing: false,
-        isAuthenticated: false,
+        isAuthenticated: !!(await this.getAuthToken(false)),
       };
       const token = await this.getAuthToken(false);
       this.state.isAuthenticated = !!token;
@@ -870,6 +894,8 @@ export class GoogleDriveSyncService {
         gvLastUploadTime: this.state.lastUploadTime,
         gvLastSyncTimeAIStudio: this.state.lastSyncTimeAIStudio,
         gvLastUploadTimeAIStudio: this.state.lastUploadTimeAIStudio,
+        gvLastSyncTimeNotebookLM: this.state.lastSyncTimeNotebookLM,
+        gvLastUploadTimeNotebookLM: this.state.lastUploadTimeNotebookLM,
         gvSyncError: this.state.error,
       });
     } catch (error) {

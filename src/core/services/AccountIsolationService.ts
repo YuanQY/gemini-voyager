@@ -6,6 +6,7 @@ const PROFILE_MAP_VERSION = 1;
 const ACCOUNT_ISOLATION_KEY_BY_PLATFORM = {
   gemini: StorageKeys.GV_ACCOUNT_ISOLATION_ENABLED_GEMINI,
   aistudio: StorageKeys.GV_ACCOUNT_ISOLATION_ENABLED_AISTUDIO,
+  notebooklm: StorageKeys.GV_ACCOUNT_ISOLATION_ENABLED_NOTEBOOKLM,
 } as const;
 
 interface AccountProfileRecord {
@@ -42,7 +43,7 @@ export interface AccountContext {
   email: string | null;
 }
 
-export type AccountPlatform = 'gemini' | 'aistudio';
+export type AccountPlatform = 'gemini' | 'aistudio' | 'notebooklm';
 
 function parseHostname(url: string): string | null {
   try {
@@ -60,9 +61,14 @@ function isGeminiHost(hostname: string | null): boolean {
   return hostname === 'gemini.google.com' || hostname === 'business.gemini.google';
 }
 
+function isNotebookLMHost(hostname: string | null): boolean {
+  return hostname === 'notebooklm.google.com';
+}
+
 export function detectAccountPlatformFromUrl(pageUrl: string | null | undefined): AccountPlatform {
   const hostname = parseHostname(pageUrl || '');
   if (isAIStudioHost(hostname)) return 'aistudio';
+  if (isNotebookLMHost(hostname)) return 'notebooklm';
   return 'gemini';
 }
 
@@ -227,6 +233,18 @@ export function detectAccountContextFromDocument(pageUrl: string, doc: Document)
     ]);
     if (geminiEmail) {
       return { routeUserId, email: geminiEmail };
+    }
+  }
+
+  if (isNotebookLMHost(hostname)) {
+    const notebookLMEmail = findEmailBySelectors(doc, [
+      'button[aria-label*="@"]',
+      '.account-switcher-button [aria-label*="@"]',
+      '[data-email]',
+      '[title*="@"]',
+    ]);
+    if (notebookLMEmail) {
+      return { routeUserId, email: notebookLMEmail };
     }
   }
 

@@ -1,20 +1,28 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  Project: Gemini Voyager (Browser Extension)
+  Tech Stack: TypeScript, React, Bun, Vite
+  Target Platforms: Chrome, Firefox, Safari
+  Package Manager: Bun
+  Testing: Vitest, Playwright
+  Architecture:
+    - Service-oriented architecture for state and persistence.
+    - Content scripts located in src/pages/content/.
+    - UI features in src/features/ and src/pages/.
+    - All storage directed through StorageService (except raw content scripts).
+  Conventions:
+    - No 'any' type.
+    - Prefix CSS classes with 'gv-'.
+    - Multi-locale support (10 languages).
+    - Functional components with hooks.
+    - Conventional commits.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+rules:
+  proposal:
+    - Always link to existing main specs if this is a modification.
+  specs:
+    - Use 'Scenario' for acceptance criteria.
+    - Include specific DOM selectors or CSS classes when relevant (prefixed with gv-).
+  tasks:
+    - Include a verification phase for each major milestone.
