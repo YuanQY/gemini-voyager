@@ -84,11 +84,12 @@ That's why we built **Voyager**. It's not just a tool; it's a companion that hel
 
 ## ✨ Features
 
-### 🌌 Core (Gemini & AI Studio)
+### 🌌 Core (Gemini, AI Studio & NotebookLM)
 
 - **📂 [Folder Organization](https://voyager.nagi.fun/en/guide/folders)**: Organize chats into a two-level folder hierarchy with drag-and-drop support.
   - **Gemini**: Supports **Account Isolation Mode** and **Custom Folder Colors**.
-- **💡 [Prompt Vault](https://voyager.nagi.fun/en/guide/prompts)**: Save and reuse prompts across Gemini, AI Studio, and [custom websites](https://voyager.nagi.fun/en/guide/custom-websites).
+  - **NotebookLM**: Supports **Collapsible Sidebar**, **Tree-style Folder Picker**, and **Account Isolation**.
+- **💡 [Prompt Vault](https://voyager.nagi.fun/en/guide/prompts)**: Save and reuse prompts across Gemini, AI Studio, and [custom websites](https://voyager.nagi.fun/en/guide/prompts/custom-websites).
 - **☁️ [Cloud Sync](https://voyager.nagi.fun/en/guide/cloud-sync)**: Sync folders and prompts to Google Drive.
 - **📐 Formula Copy**: One-click copy for LaTeX and MathML (Word) source codes.
 - **🌦️ Visual Effects**: Add seasonal ambience with **snow**, **cinematic rain**, or **falling sakura petals** from the settings panel.
@@ -110,6 +111,12 @@ That's why we built **Voyager**. It's not just a tool; it's a companion that hel
   - **[Default Model](https://voyager.nagi.fun/en/guide/default-model)**: Set your favorite model as default.
   - **[Hide Recent Items](https://voyager.nagi.fun/en/guide/recents-hider)**: Hide "Recent" list in the sidebar to reduce distraction.
   - **Hide Upgrade Prompts**: Hide "Upgrade to Google AI Ultra" elements in the sidebar and model menu to reduce distraction (Enabled by default).
+
+### 📓 NotebookLM Exclusive
+
+- **🗂️ Collapsible Sidebar**: Toggle the folder panel to focus on your notebooks or keep your organization at hand.
+- **🖱️ [Move to Folder](https://voyager.nagi.fun/en/guide/folders/move-to-folder)**: Seamlessly move notebooks via the native "More Actions" menu on project cards.
+- **🌲 Tree Hierarchy**: Navigate complex folder structures with a clear, monospace tree-style picker in the move dialog.
 
 ### 🎨 Personalization
 

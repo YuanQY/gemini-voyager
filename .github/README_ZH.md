@@ -84,11 +84,12 @@
 
 ## ✨ 功能特性
 
-### 🌌 通用核心 (Gemini & AI Studio)
+### 🌌 通用核心 (Gemini, AI Studio & NotebookLM)
 
 - **📂 [文件夹管理](https://voyager.nagi.fun/guide/folders)**: 支持 **多级目录**、**拖拽排序** 及 **Google Drive 同步**。
   - **Gemini**: 支持 **多账号隔离模式** 及 **自定义文件夹颜色**。
-- **💡 [提示词库](https://voyager.nagi.fun/guide/prompts)**: 跨平台同步提示词，支持 Gemini、AI Studio 及 [自定义网站](https://voyager.nagi.fun/guide/custom-websites)。
+  - **NotebookLM**: 支持 **可收缩侧边栏**、**树形文件夹选择器** 及 **多账号隔离**。
+- **💡 [提示词库](https://voyager.nagi.fun/guide/prompts)**: 跨平台同步提示词，支持 Gemini、AI Studio 及 [自定义网站](https://voyager.nagi.fun/guide/prompts/custom-websites)。
 - **☁️ [云同步](https://voyager.nagi.fun/guide/cloud-sync)**: 支持将文件夹和提示词库同步到 Google Drive。
 - **📐 公式复制**: 一键复制 LaTeX 和 MathML (Word) 源码。
 - **🌦️ 视觉特效**: 在设置面板里一键切换 **飘雪**、**电影感雨滴** 或 **樱花飘落**，给页面增加季节氛围。
@@ -110,6 +111,12 @@
   - **[默认模型](https://voyager.nagi.fun/guide/default-model)**: 为新对话设置默认选中的模型。
   - **[隐藏最近项目](https://voyager.nagi.fun/guide/recents-hider)**: 隐藏侧边栏的“最近”列表，减少干扰。
   - **隐藏升级提醒**: 自动隐藏 Gemini 侧边栏和模型切换菜单中的“升级到 Google AI Ultra”按钮（默认开启）。
+
+### 📓 NotebookLM 专属增强
+
+- **🗂️ 可收缩侧边栏**: 随意折叠文件夹面板，释放屏幕空间，专注你的笔记本。
+- **🖱️ [移动到文件夹](https://voyager.nagi.fun/guide/folders/move-to-folder)**: 无缝集成到项目卡片的原生“更多”菜单（三个点）。
+- **🌲 树形层级**: 在移动对话框中通过清晰的等宽线条展示复杂的文件夹层级。
 
 ### 🎨 个性化体验
 
