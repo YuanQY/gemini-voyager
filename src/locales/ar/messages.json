@@ -1482,5 +1482,53 @@
   "duplicate_notebook_error": {
     "message": "هذا الكتاب موجود بالفعل في المجلد المستهدف.",
     "description": "Error message when adding a duplicate notebook to a folder"
+  },
+  "account_isolation_status": {
+    "message": "تم {status} وضع عزل الحساب. يرجى تحديث الصفحة لتطبيق التغييرات.",
+    "description": "Account isolation toggle status"
+  },
+  "enabled": {
+    "message": "تفعيل",
+    "description": "Enabled status"
+  },
+  "disabled": {
+    "message": "تعطيل",
+    "description": "Disabled status"
+  },
+  "folder_cloud_upload_processing": {
+    "message": "جاري رفع المجلدات إلى Google Drive...",
+    "description": "Uploading folders message"
+  },
+  "folder_cloud_sync_processing": {
+    "message": "جاري مزامنة المجلدات من Google Drive...",
+    "description": "Syncing folders message"
+  },
+  "folder_cloud_upload_success": {
+    "message": "✓ تم رفع المجلدات بنجاح",
+    "description": "Upload success message"
+  },
+  "folder_cloud_sync_success": {
+    "message": "✓ تم مزامنة {folders} مجلدات من السحابة",
+    "description": "Sync success message"
+  },
+  "folder_cloud_upload_error": {
+    "message": "✗ فشل الرفع: {error}",
+    "description": "Upload error message"
+  },
+  "folder_cloud_sync_error": {
+    "message": "✗ فشل المزامنة: {error}",
+    "description": "Sync error message"
+  },
+  "folder_create_success": {
+    "message": "✓ تم إنشاء المجلد بنجاح",
+    "description": "Successfully created folder toast"
+  },
+  "folder_rename_success": {
+    "message": "✓ تم إعادة تسمية المجلد بنجاح",
+    "description": "Successfully renamed folder toast"
+  },
+  "folder_delete_success": {
+    "message": "✓ تم حذف المجلد بنجاح",
+    "description": "Successfully deleted folder toast"
   }
 }

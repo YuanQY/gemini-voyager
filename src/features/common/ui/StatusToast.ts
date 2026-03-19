@@ -137,6 +137,23 @@ export function createStatusToastManager(
   content: "❌";
 }
 
+/* Spinner for pending state */
+@keyframes gv-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.gv-status-toast--pending::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: gv-spin 0.8s linear infinite;
+}
+
 /* Dark Mode Support (System & Class-based) */
 @media (prefers-color-scheme: dark) {
   .gv-status-toast {
@@ -150,7 +167,7 @@ export function createStatusToastManager(
   }
 }
 
-/* Explicit .dark class support (if Gemini adds it to body) */
+/* Explicit .dark class support (if host adds it to body) */
 body.dark .gv-status-toast, 
 html.dark .gv-status-toast {
   background: rgba(30, 41, 59, 0.95);
@@ -229,9 +246,15 @@ html.dark .gv-status-toast {
     container.style.bottom = 'auto';
   };
 
-  const applyLevelClass = (element: HTMLElement, level: StatusToastLevel): void => {
+  const applyLevelClass = (element: HTMLElement, level: StatusToastLevel, options: ToastOptions = {}): void => {
     element.classList.remove(...LEVEL_CLASSES.map((value) => `gv-status-toast--${value}`));
-    element.classList.add(`gv-status-toast--${level}`);
+    element.classList.remove('gv-status-toast--pending');
+    
+    if (options.pending) {
+      element.classList.add('gv-status-toast--pending');
+    } else {
+      element.classList.add(`gv-status-toast--${level}`);
+    }
   };
 
   const removeToast = (toast: ToastRecord): void => {
@@ -263,7 +286,7 @@ html.dark .gv-status-toast {
     const toast = document.createElement('div');
     toast.className = 'gv-status-toast';
     toast.textContent = message;
-    applyLevelClass(toast, level);
+    applyLevelClass(toast, level, options);
     container.appendChild(toast);
 
     const id = `gv-toast-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -305,7 +328,7 @@ html.dark .gv-status-toast {
     const record = toasts.find((toast) => toast.id === id);
     if (!record) return false;
     record.element.textContent = message;
-    applyLevelClass(record.element, level);
+    applyLevelClass(record.element, level, options);
     if (options.markFinal) {
       record.isFinal = true;
     }
@@ -325,7 +348,7 @@ html.dark .gv-status-toast {
     if (!record) return false;
 
     record.element.textContent = message;
-    applyLevelClass(record.element, level);
+    applyLevelClass(record.element, level, options);
     if (options.markFinal) {
       record.isFinal = true;
     }

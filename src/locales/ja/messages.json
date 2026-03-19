@@ -1482,5 +1482,53 @@
   "duplicate_notebook_error": {
     "message": "このノートブックは既にターゲットフォルダーにあります。",
     "description": "Error message when adding a duplicate notebook to a folder"
+  },
+  "account_isolation_status": {
+    "message": "アカウント隔離モードが{status}になりました。変更を適用するにはページを更新してください。",
+    "description": "Account isolation toggle status"
+  },
+  "enabled": {
+    "message": "無効から有効",
+    "description": "Enabled status"
+  },
+  "disabled": {
+    "message": "有効から無効",
+    "description": "Disabled status"
+  },
+  "folder_cloud_upload_processing": {
+    "message": "Google ドライブにフォルダをアップロード中...",
+    "description": "Uploading folders message"
+  },
+  "folder_cloud_sync_processing": {
+    "message": "Google ドライブからフォルダを同期中...",
+    "description": "Syncing folders message"
+  },
+  "folder_cloud_upload_success": {
+    "message": "✓ フォルダのアップロードが完了しました",
+    "description": "Upload success message"
+  },
+  "folder_cloud_sync_success": {
+    "message": "✓ クラウドから {folders} 個のフォルダを同期しました",
+    "description": "Sync success message"
+  },
+  "folder_cloud_upload_error": {
+    "message": "✗ アップロードに失敗しました: {error}",
+    "description": "Upload error message"
+  },
+  "folder_cloud_sync_error": {
+    "message": "✗ 同期に失敗しました: {error}",
+    "description": "Sync error message"
+  },
+  "folder_create_success": {
+    "message": "✓ フォルダが正常に作成されました",
+    "description": "Successfully created folder toast"
+  },
+  "folder_rename_success": {
+    "message": "✓ フォルダ名が正常に変更されました",
+    "description": "Successfully renamed folder toast"
+  },
+  "folder_delete_success": {
+    "message": "✓ フォルダが正常に削除されました",
+    "description": "Successfully deleted folder toast"
   }
 }

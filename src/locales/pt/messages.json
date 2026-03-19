@@ -1482,5 +1482,53 @@
   "duplicate_notebook_error": {
     "message": "Este caderno já está na pasta de destino.",
     "description": "Error message when adding a duplicate notebook to a folder"
+  },
+  "account_isolation_status": {
+    "message": "Modo de isolamento de conta {status}. Reinicie a página para aplicar as alterações.",
+    "description": "Account isolation toggle status"
+  },
+  "enabled": {
+    "message": "Ativado",
+    "description": "Enabled status"
+  },
+  "disabled": {
+    "message": "Desativado",
+    "description": "Disabled status"
+  },
+  "folder_cloud_upload_processing": {
+    "message": "Enviando pastas para o Google Drive...",
+    "description": "Uploading folders message"
+  },
+  "folder_cloud_sync_processing": {
+    "message": "Sincronizando pastas do Google Drive...",
+    "description": "Syncing folders message"
+  },
+  "folder_cloud_upload_success": {
+    "message": "✓ Pastas enviadas com sucesso",
+    "description": "Upload success message"
+  },
+  "folder_cloud_sync_success": {
+    "message": "✓ {folders} pastas sincronizadas da nuvem",
+    "description": "Sync success message"
+  },
+  "folder_cloud_upload_error": {
+    "message": "✗ Falha no envio: {error}",
+    "description": "Upload error message"
+  },
+  "folder_cloud_sync_error": {
+    "message": "✗ Falha na sincronização: {error}",
+    "description": "Sync error message"
+  },
+  "folder_create_success": {
+    "message": "✓ Pasta criada com sucesso",
+    "description": "Successfully created folder toast"
+  },
+  "folder_rename_success": {
+    "message": "✓ Pasta renomeada com sucesso",
+    "description": "Successfully renamed folder toast"
+  },
+  "folder_delete_success": {
+    "message": "✓ Pasta eliminada com sucesso",
+    "description": "Successfully deleted folder toast"
   }
 }

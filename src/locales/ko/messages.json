@@ -1482,5 +1482,53 @@
   "duplicate_notebook_error": {
     "message": "이 노트북은 이미 대상 폴더에 있습니다.",
     "description": "Error message when adding a duplicate notebook to a folder"
+  },
+  "account_isolation_status": {
+    "message": "계정 격리 모드가 {status}되었습니다. 변경 사항을 적용하려면 페이지를 새로고침하세요.",
+    "description": "Account isolation toggle status"
+  },
+  "enabled": {
+    "message": "활성화",
+    "description": "Enabled status"
+  },
+  "disabled": {
+    "message": "비활성화",
+    "description": "Disabled status"
+  },
+  "folder_cloud_upload_processing": {
+    "message": "Google 드라이브에 폴더 업로드 중...",
+    "description": "Uploading folders message"
+  },
+  "folder_cloud_sync_processing": {
+    "message": "Google 드라이브에서 폴더 동기화 중...",
+    "description": "Syncing folders message"
+  },
+  "folder_cloud_upload_success": {
+    "message": "✓ 폴더 업로드 성공",
+    "description": "Upload success message"
+  },
+  "folder_cloud_sync_success": {
+    "message": "✓ 클라우드에서 {folders}개 폴더 동기화됨",
+    "description": "Sync success message"
+  },
+  "folder_cloud_upload_error": {
+    "message": "✗ 업로드 실패: {error}",
+    "description": "Upload error message"
+  },
+  "folder_cloud_sync_error": {
+    "message": "✗ 동기화 실패: {error}",
+    "description": "Sync error message"
+  },
+  "folder_create_success": {
+    "message": "✓ 폴더가 성공적으로 생성되었습니다",
+    "description": "Successfully created folder toast"
+  },
+  "folder_rename_success": {
+    "message": "✓ 폴더 이름이 성공적으로 변경되었습니다",
+    "description": "Successfully renamed folder toast"
+  },
+  "folder_delete_success": {
+    "message": "✓ 폴더가 성공적으로 삭제되었습니다",
+    "description": "Successfully deleted folder toast"
   }
 }

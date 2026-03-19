@@ -17,7 +17,7 @@ import { getTranslationSync } from '@/utils/i18n';
 import type { TranslationKey } from '@/utils/translations';
 
 import { DOWNLOAD_ICON_SELECTOR, findNativeDownloadButton } from './downloadButton';
-import { type StatusToastManager, createStatusToastManager } from './statusToast';
+import { type StatusToastManager, createStatusToastManager } from '@/features/common/ui/StatusToast';
 import { WatermarkEngine } from './watermarkEngine';
 
 let engine: WatermarkEngine | null = null;

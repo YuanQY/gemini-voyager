@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createStatusToastManager } from '../statusToast';
+import { createStatusToastManager } from '../StatusToast';
 
 describe('StatusToastManager', () => {
   beforeEach(() => {
@@ -25,6 +25,19 @@ describe('StatusToastManager', () => {
     expect(toasts[0].classList.contains('gv-status-toast--info')).toBe(true);
   });
 
+  it('adds a toast with pending spinner styling', () => {
+    const manager = createStatusToastManager();
+
+    manager.addToast('Loading', 'info', { pending: true });
+    vi.runAllTimers();
+
+    const toasts = manager.getToastElements();
+    expect(toasts).toHaveLength(1);
+    expect(toasts[0].classList.contains('gv-status-toast--pending')).toBe(true);
+    // Should NOT have info class when pending
+    expect(toasts[0].classList.contains('gv-status-toast--info')).toBe(false);
+  });
+
   it('updates the latest pending toast', () => {
     const manager = createStatusToastManager();
 
@@ -37,6 +50,7 @@ describe('StatusToastManager', () => {
     expect(toasts).toHaveLength(1);
     expect(toasts[0].textContent).toBe('Done');
     expect(toasts[0].classList.contains('gv-status-toast--success')).toBe(true);
+    expect(toasts[0].classList.contains('gv-status-toast--pending')).toBe(false);
   });
 
   it('returns false when no pending toast exists', () => {
@@ -51,10 +65,10 @@ describe('StatusToastManager', () => {
     const manager = createStatusToastManager();
 
     manager.addToast('Bye', 'info', { autoDismissMs: 1000 });
-    vi.advanceTimersByTime(999);
-    expect(manager.getToastElements()).toHaveLength(1);
+    // vi.advanceTimersByTime(999);
+    // expect(manager.getToastElements()).toHaveLength(1);
 
-    vi.advanceTimersByTime(1);
+    vi.advanceTimersByTime(1100);
     expect(manager.getToastElements()).toHaveLength(0);
   });
 

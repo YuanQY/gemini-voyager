@@ -28,23 +28,13 @@ Users SHALL be able to create and manage multi-level folder structures.
 - **THEN** it MUST support: **Rename**, **Change Color**, **Delete**, and **Add Subfolder**.
 
 ### Requirement: Notebook Organization
-The system SHALL enable seamless movement of notebooks into folders via drag-and-drop or explicit menus.
-
-#### Scenario: Advanced Drag-and-Drop
-- **WHEN** user drags a notebook over the sidebar
-- **THEN** a compact "Small Drag Preview" SHOULD be shown.
-- **AND** the target folder MUST show a "dashed outline" stable highlight (no flickering).
-- **AND** dropping the item MUST move the notebook to the specific sub-folder (using `stopPropagation`).
+The system SHALL enable seamless movement of notebooks into folders via drag-and-drop or explicit menus, and MUST provide localized, non-blocking feedback for both successful and duplicate additions.
 
 #### Scenario: Native Menu ("Move to Folder")
 - **WHEN** user clicks "More Actions" on a notebook card
 - **THEN** a "Move to Folder" button MUST be injected into the native menu.
 - **AND** clicking it MUST show a **Tree-style Folder Picker**.
-
-#### Scenario: Prevent Duplicate Addition
-- **WHEN** user attempts to add a notebook to a folder that already contains it (via Drag-and-Drop or Folder Picker)
-- **THEN** the system MUST NOT add the notebook again.
-- **AND** the system MUST show a localized informative feedback alert telling the user the item already exists in the target folder.
+- **AND** it MUST provide a non-blocking Toast feedback upon completion.
 
 ### Requirement: Robustness & Isolation
 The system SHALL ensure features work correctly across sessions and accounts.
@@ -58,6 +48,25 @@ The system SHALL ensure features work correctly across sessions and accounts.
 - **WHEN** folder data is stored or retrieved
 - **THEN** it MUST be scoped to the specific user email (e.g., `gvFolderDataNotebookLM:acct:{email}`).
 - **AND** the system SHOULD retry account detection during UI refreshes.
+
+### Requirement: Modern Notification Feedback
+The system SHALL use a modern, non-blocking toast notification system for all NotebookLM folder operations, replacing intrusive native `alert()` dialogs.
+
+#### Scenario: Visual Confirmation of Action
+- **WHEN** user successfully Creates, Renames, Decuplicates, or Deletes a folder/notebook
+- **THEN** a localized Toast notification MUST be displayed with a "Success" icon.
+- **AND** it MUST auto-dismiss after a brief delay (e.g., 2200ms).
+
+#### Scenario: Long-Running Operation Feedback
+- **WHEN** user clicks "Upload to Cloud" or "Sync from Cloud"
+- **THEN** a persistent "Processing" Toast notification MUST be immediately displayed with an "Info" level icon.
+- **AND** it MUST NOT auto-dismiss until the operation succeeds or fails.
+- **AND** upon completion, the Toast MUST update to "Success" or "Error" state/icon and then auto-dismiss after a delay.
+
+#### Scenario: Error Feedback
+- **WHEN** an operation fails (e.g., Cloud Sync error)
+- **THEN** a Toast notification with an "Error" icon MUST be displayed showing the failure message.
+- **AND** it SHOULD NOT auto-dismiss immediately to ensure user visibility.
 
 ## Design Patterns
 

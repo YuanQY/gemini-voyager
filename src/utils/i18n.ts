@@ -121,6 +121,14 @@ export function setCachedLanguage(lang: AppLanguage): void {
  * Create a translator function that uses cached language
  * This is useful for classes that need a simple t() function
  */
-export function createTranslator(): (key: string) => string {
-  return (key: string) => getTranslationSyncUnsafe(key);
+export function createTranslator(): (key: string, replacements?: Record<string, string | number>) => string {
+  return (key: string, replacements?: Record<string, string | number>) => {
+    let message = getTranslationSyncUnsafe(key);
+    if (replacements) {
+      Object.entries(replacements).forEach(([k, v]) => {
+        message = message.replace(`{${k}}`, String(v));
+      });
+    }
+    return message;
+  };
 }

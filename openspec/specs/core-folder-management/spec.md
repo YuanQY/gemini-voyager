@@ -1,7 +1,7 @@
-## Core Folder Management Specification
-
+## Purpose 
 This specification defines the multi-site routing and storage isolation architecture for folder management across different Google AI platforms.
 
+## Requirements
 ### Requirement: Multi-Site Content Script Routing
 The system SHALL route content script initialization to the correct folder manager based on the current hostname.
 
@@ -28,3 +28,4 @@ The system SHALL reuse existing `FolderData`, `Folder`, and `ConversationReferen
 #### Scenario: Type compatibility
 - **WHEN** `NotebookLMFolderManager` creates folder data
 - **THEN** the data MUST conform to the `FolderData` interface defined in `src/pages/content/folder/types.ts`
+

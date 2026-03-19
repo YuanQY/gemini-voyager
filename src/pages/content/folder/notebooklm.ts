@@ -12,6 +12,7 @@ import { FolderImportExportService } from '@/features/folder/services/FolderImpo
 import type { FolderExportPayload } from '@/features/folder/types/import-export';
 import { createTranslator, initI18n } from '@/utils/i18n';
 
+import { type StatusToastManager, createStatusToastManager } from '@/features/common/ui/StatusToast';
 import type { FolderData, Folder, ConversationDragData, ConversationReference } from '@/core/types/folder';
 
 /**
@@ -24,7 +25,8 @@ function validateFolderData(data: unknown): boolean {
 }
 
 export class NotebookLMFolderManager {
-  private t: (key: string) => string = (k) => k;
+  private t: (key: string, replacements?: Record<string, string | number>) => string = (k) => k;
+  private toast: StatusToastManager | null = null;
   private data: FolderData = { folders: [], folderContents: {} };
   private container: HTMLElement | null = null;
   private listElement: HTMLElement | null = null;
@@ -45,6 +47,7 @@ export class NotebookLMFolderManager {
     try {
       await initI18n();
       this.t = createTranslator();
+      this.toast = createStatusToastManager();
     } catch (e) {
       console.error('[NotebookLMFolderManager] i18n init failed:', e);
     }
@@ -281,7 +284,7 @@ export class NotebookLMFolderManager {
             console.log('[NotebookLMFolderManager] Target folder selected:', f.name);
             const success = await this.handleDrop(f.id, JSON.stringify(notebook));
             if (!success) {
-              alert(this.t('duplicate_notebook_error') || 'This notebook is already in the target folder.');
+              this.toast?.addToast(this.t('duplicate_notebook_error'), 'error', { autoDismissMs: 3000 });
             }
             dialog.remove();
             this.render();
@@ -538,7 +541,7 @@ export class NotebookLMFolderManager {
       if (data) {
         const success = await this.handleDrop(folder.id, data);
         if (!success) {
-          alert(this.t('duplicate_notebook_error') || 'This notebook is already in the target folder.');
+          this.toast?.addToast(this.t('duplicate_notebook_error'), 'error', { autoDismissMs: 3000 });
         }
         this.render();
       }
@@ -958,6 +961,7 @@ export class NotebookLMFolderManager {
     this.data.folders.push(newFolder);
     this.data.folderContents[newFolder.id] = [];
     await this.save();
+    this.toast?.addToast(this.t('folder_create_success'), 'success', { autoDismissMs: 2200 });
   }
 
   async renameFolder(id: string, name: string): Promise<void> {
@@ -966,6 +970,7 @@ export class NotebookLMFolderManager {
       folder.name = name;
       folder.updatedAt = Date.now();
       await this.save();
+      this.toast?.addToast(this.t('folder_rename_success'), 'success', { autoDismissMs: 2200 });
     }
   }
 
@@ -973,6 +978,7 @@ export class NotebookLMFolderManager {
     this.data.folders = this.data.folders.filter(f => f.id !== id);
     delete this.data.folderContents[id];
     await this.save();
+    this.toast?.addToast(this.t('folder_delete_success'), 'success', { autoDismissMs: 2200 });
   }
 
   async toggleFolder(id: string): Promise<void> {
@@ -1075,8 +1081,9 @@ export class NotebookLMFolderManager {
     await chrome.storage.sync.set({
       [StorageKeys.GV_ACCOUNT_ISOLATION_ENABLED_NOTEBOOKLM]: newState
     });
-    
-    alert(`Account Isolation ${newState ? 'Enabled' : 'Disabled'}. Please refresh the page to apply changes.`);
+    this.toast?.addToast(this.t('account_isolation_status', { 
+      status: newState ? this.t('enabled') : this.t('disabled') 
+    }), 'info', { autoDismissMs: 5000 });
   }
 
   /**
@@ -1139,11 +1146,28 @@ export class NotebookLMFolderManager {
           if (mergeResult.success) {
             this.data = mergeResult.data.data;
             await this.save();
-            this.render();
-            alert('Import successful!');
+            await this.render();
+            const foldersSkipped = mergeResult.data.stats.duplicatesFoldersSkipped || 0;
+            const conversationsSkipped = mergeResult.data.stats.duplicatesConversationsSkipped || 0;
+            const totalSkipped = foldersSkipped + conversationsSkipped;
+
+            if (totalSkipped > 0) {
+              this.toast?.addToast(this.t('folder_import_success_skipped', { 
+                folders: mergeResult.data.stats.foldersImported,
+                conversations: mergeResult.data.stats.conversationsImported,
+                skipped: totalSkipped
+              }), 'success', { autoDismissMs: 2200 });
+            } else {
+              this.toast?.addToast(this.t('folder_import_success', { 
+                folders: mergeResult.data.stats.foldersImported,
+                conversations: mergeResult.data.stats.conversationsImported
+              }), 'success', { autoDismissMs: 2200 });
+            }
+          } else {
+            this.toast?.addToast(this.t('folder_import_invalid_format'), 'error');
           }
         } else {
-          alert('Invalid file format');
+          this.toast?.addToast(this.t('folder_import_invalid_format'), 'error');
         }
       }
     };
@@ -1154,6 +1178,7 @@ export class NotebookLMFolderManager {
    * Cloud Sync Implementation
    */
   private async handleCloudUpload(): Promise<void> {
+    this.toast?.addToast(this.t('folder_cloud_upload_processing'), 'info', { pending: true });
     try {
       const response = (await browser.runtime.sendMessage({
         type: 'gv.sync.upload',
@@ -1166,16 +1191,21 @@ export class NotebookLMFolderManager {
       })) as SyncResponse;
 
       if (response?.ok) {
-        alert('Upload successful!');
+        this.toast?.updateLatestPending(this.t('folder_cloud_upload_success'), 'success', { markFinal: true, autoDismissMs: 2200 });
       } else {
-        alert(`Upload failed: ${response?.error || 'Unknown error'}`);
+        this.toast?.updateLatestPending(this.t('folder_cloud_upload_error', { 
+          error: response?.error || 'Unknown' 
+        }), 'error', { markFinal: true });
       }
-    } catch (e) {
-      alert('Cloud upload failed. Check extension permissions.');
+    } catch (error: any) {
+      this.toast?.updateLatestPending(this.t('folder_cloud_upload_error', { 
+        error: error.message || 'Unknown' 
+      }), 'error', { markFinal: true });
     }
   }
 
   private async handleCloudSync(): Promise<void> {
+    this.toast?.addToast(this.t('folder_cloud_sync_processing'), 'info', { pending: true });
     try {
       const response = (await browser.runtime.sendMessage({
         type: 'gv.sync.download',
@@ -1213,12 +1243,18 @@ export class NotebookLMFolderManager {
         this.data = { folders: mergedFolders, folderContents: mergedContents };
         await this.save();
         this.render();
-        alert('Sync successful!');
+        this.toast?.updateLatestPending(this.t('folder_cloud_sync_success', { 
+          folders: this.data.folders.length 
+        }), 'success', { markFinal: true, autoDismissMs: 2200 });
       } else {
-        alert(`Sync failed: ${response?.error || 'No data found'}`);
+        this.toast?.updateLatestPending(this.t('folder_cloud_sync_error', { 
+          error: response?.error || 'No data found' 
+        }), 'error', { markFinal: true });
       }
-    } catch (e) {
-      alert('Cloud sync failed.');
+    } catch (error: any) {
+      this.toast?.updateLatestPending(this.t('folder_cloud_sync_error', { 
+        error: error.message || 'Unknown' 
+      }), 'error', { markFinal: true });
     }
   }
 }

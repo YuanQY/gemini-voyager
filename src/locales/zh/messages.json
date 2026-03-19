@@ -403,6 +403,18 @@
     "message": "账号隔离模式",
     "description": "Show only conversations from the current Google account"
   },
+  "account_isolation_status": {
+    "message": "账号隔离模式已{status}。请刷新页面以应用更改。",
+    "description": "Account isolation toggle status"
+  },
+  "enabled": {
+    "message": "启用",
+    "description": "Enabled status"
+  },
+  "disabled": {
+    "message": "禁用",
+    "description": "Disabled status"
+  },
   "folder_export": {
     "message": "导出文件夹",
     "description": "导出文件夹按钮提示"
@@ -418,6 +430,30 @@
   "folder_cloud_sync": {
     "message": "从云端同步",
     "description": "云同步按钮提示"
+  },
+  "folder_cloud_upload_processing": {
+    "message": "正在上传文件夹到 Google Drive...",
+    "description": "Uploading folders message"
+  },
+  "folder_cloud_sync_processing": {
+    "message": "正在从 Google Drive 同步文件夹...",
+    "description": "Syncing folders message"
+  },
+  "folder_cloud_upload_success": {
+    "message": "✓ 文件夹上传成功",
+    "description": "Upload success message"
+  },
+  "folder_cloud_sync_success": {
+    "message": "✓ 已从云端同步 {folders} 个文件夹",
+    "description": "Sync success message"
+  },
+  "folder_cloud_upload_error": {
+    "message": "✗ 上传失败：{error}",
+    "description": "Upload error message"
+  },
+  "folder_cloud_sync_error": {
+    "message": "✗ 同步失败：{error}",
+    "description": "Sync error message"
   },
   "folder_import": {
     "message": "导入文件夹",
@@ -1482,5 +1518,17 @@
   "duplicate_notebook_error": {
     "message": "此笔记已存在于目标文件夹中。",
     "description": "Error message when adding a duplicate notebook to a folder"
+  },
+  "folder_create_success": {
+    "message": "✓ 文件夹创建成功",
+    "description": "Successfully created folder toast"
+  },
+  "folder_rename_success": {
+    "message": "✓ 文件夹重命名成功",
+    "description": "Successfully renamed folder toast"
+  },
+  "folder_delete_success": {
+    "message": "✓ 文件夹删除成功",
+    "description": "Successfully deleted folder toast"
   }
 }

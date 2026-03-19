@@ -13,6 +13,17 @@ vi.mock('@/utils/i18n', () => ({
   createTranslator: vi.fn(() => (k: string) => k),
 }));
 
+vi.mock('@/features/common/ui/StatusToast', () => ({
+  createStatusToastManager: vi.fn(() => ({
+    addToast: vi.fn(),
+    removeToast: vi.fn(),
+    updateToast: vi.fn(),
+    updateLatestPending: vi.fn(),
+    setAnchorElement: vi.fn(),
+    getToastElements: vi.fn(() => []),
+  })),
+}));
+
 vi.mock('@/core/services/AccountIsolationService', () => ({
   detectAccountContextFromDocument: vi.fn(() => Promise.resolve({ email: 'test@example.com', routeUserId: '123' })),
   accountIsolationService: {
@@ -280,9 +291,10 @@ describe('NotebookLMFolderManager', () => {
       expect(success2).toBe(false);
     });
 
-    it('shows alert when handleDrop fails (duplicate) in createFolderElement drop handler', async () => {
+    it('shows toast when handleDrop fails (duplicate) in createFolderElement drop handler', async () => {
       const manager = new NotebookLMFolderManager();
       managers.push(manager);
+      await manager.init(); // Initialize toast
       await manager.createFolder('Repeat Folder');
       const folder = (manager as any).data.folders[0];
       
@@ -291,9 +303,6 @@ describe('NotebookLMFolderManager', () => {
       const dragData = { type: 'conversation', conversationId: 'dup-1', title: 'Dup' };
       // First drop (success)
       await (manager as any).handleDrop(folder.id, JSON.stringify(dragData));
-      
-      // Spy on alert
-      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
       
       // Simulate drop event
       const dropEvent = new CustomEvent('drop', { bubbles: true }) as any;
@@ -308,8 +317,7 @@ describe('NotebookLMFolderManager', () => {
       // Wait for async handleDrop in listener
       await new Promise(resolve => setTimeout(resolve, 0));
       
-      expect(alertSpy).toHaveBeenCalled();
-      alertSpy.mockRestore();
+      expect((manager as any).toast.addToast).toHaveBeenCalledWith(expect.any(String), 'error', expect.any(Object));
     });
 
     it('removeFromFolder removes a notebook from a folder', async () => {

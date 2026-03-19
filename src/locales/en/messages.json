@@ -403,6 +403,18 @@
     "message": "Account Isolation",
     "description": "Show only conversations from the current Google account"
   },
+  "account_isolation_status": {
+    "message": "Account Isolation {status}. Please refresh the page to apply changes.",
+    "description": "Account isolation toggle status"
+  },
+  "enabled": {
+    "message": "Enabled",
+    "description": "Enabled status"
+  },
+  "disabled": {
+    "message": "Disabled",
+    "description": "Disabled status"
+  },
   "folder_export": {
     "message": "Export folders",
     "description": "Export folders button tooltip"
@@ -418,6 +430,30 @@
   "folder_cloud_sync": {
     "message": "Sync from Cloud",
     "description": "Cloud sync button tooltip"
+  },
+  "folder_cloud_upload_processing": {
+    "message": "Uploading folders to Google Drive...",
+    "description": "Uploading folders message"
+  },
+  "folder_cloud_sync_processing": {
+    "message": "Syncing folders from Google Drive...",
+    "description": "Syncing folders message"
+  },
+  "folder_cloud_upload_success": {
+    "message": "✓ Folder upload successful",
+    "description": "Upload success message"
+  },
+  "folder_cloud_sync_success": {
+    "message": "✓ Synced {folders} folders from cloud",
+    "description": "Sync success message"
+  },
+  "folder_cloud_upload_error": {
+    "message": "✗ Cloud upload failed: {error}",
+    "description": "Upload error message"
+  },
+  "folder_cloud_sync_error": {
+    "message": "✗ Cloud sync failed: {error}",
+    "description": "Sync error message"
   },
   "folder_import": {
     "message": "Import folders",
@@ -1482,5 +1518,17 @@
   "duplicate_notebook_error": {
     "message": "This notebook is already in the target folder.",
     "description": "Error message when adding a duplicate notebook to a folder"
+  },
+  "folder_create_success": {
+    "message": "✓ Folder created successfully",
+    "description": "Successfully created folder toast"
+  },
+  "folder_rename_success": {
+    "message": "✓ Folder renamed successfully",
+    "description": "Successfully renamed folder toast"
+  },
+  "folder_delete_success": {
+    "message": "✓ Folder deleted successfully",
+    "description": "Successfully deleted folder toast"
   }
 }

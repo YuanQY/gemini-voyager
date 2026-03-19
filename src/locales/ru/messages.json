@@ -1482,5 +1482,53 @@
   "duplicate_notebook_error": {
     "message": "Этот блокнот уже находится в целевой папке.",
     "description": "Error message when adding a duplicate notebook to a folder"
+  },
+  "account_isolation_status": {
+    "message": "Режим изоляции аккаунта {status}. Обновите страницу, чтобы применить изменения.",
+    "description": "Account isolation toggle status"
+  },
+  "enabled": {
+    "message": "включен",
+    "description": "Enabled status"
+  },
+  "disabled": {
+    "message": "выключен",
+    "description": "Disabled status"
+  },
+  "folder_cloud_upload_processing": {
+    "message": "Загрузка папок в Google Диск...",
+    "description": "Uploading folders message"
+  },
+  "folder_cloud_sync_processing": {
+    "message": "Синхронизация папок из Google Диска...",
+    "description": "Syncing folders message"
+  },
+  "folder_cloud_upload_success": {
+    "message": "✓ Папки успешно загружены",
+    "description": "Upload success message"
+  },
+  "folder_cloud_sync_success": {
+    "message": "✓ Синхронизировано {folders} папок из облака",
+    "description": "Sync success message"
+  },
+  "folder_cloud_upload_error": {
+    "message": "✗ Ошибка загрузки: {error}",
+    "description": "Upload error message"
+  },
+  "folder_cloud_sync_error": {
+    "message": "✗ Ошибка синхронизации: {error}",
+    "description": "Sync error message"
+  },
+  "folder_create_success": {
+    "message": "✓ Папка успешно создана",
+    "description": "Successfully created folder toast"
+  },
+  "folder_rename_success": {
+    "message": "✓ Папка успешно переименована",
+    "description": "Successfully renamed folder toast"
+  },
+  "folder_delete_success": {
+    "message": "✓ Папка успешно удалена",
+    "description": "Successfully deleted folder toast"
   }
 }
