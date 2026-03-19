@@ -167,41 +167,58 @@ export class NotebookLMFolderManager {
    * Inject Move to folder into native menu
    */
   private checkAndInjectMenuAction() {
-    const menu = document.querySelector('.mat-mdc-menu-content:not(.gv-injected)');
-    if (menu && this.lastNotebookInfo) {
-      menu.classList.add('gv-injected');
-      
-      const item = document.createElement('button');
-      item.className = 'mat-mdc-menu-item mat-focus-indicator project-button-hamburger-menu-action gv-move-to-folder-btn';
-      item.role = 'menuitem';
-      item.innerHTML = `
-        <mat-icon role="img" class="mat-icon notranslate google-symbols mat-icon-no-color" aria-hidden="true" style="margin-right: 8px;">folder</mat-icon>
-        <span class="mat-mdc-menu-item-text">Move to Folder</span>
-        <div class="mat-ripple mat-mdc-menu-ripple"></div>
-      `;
-      
-      const notebook = { ...this.lastNotebookInfo };
-      item.addEventListener('click', (e) => {
-        console.log('[NotebookLMFolderManager] Move to folder clicked for:', notebook.title);
-        e.preventDefault();
-        e.stopPropagation();
-        
-        this.showFolderPicker(notebook);
-        
-        // Close the native menu by clicking the backdrop if it exists
-        const backdrop = document.querySelector('.cdk-overlay-backdrop');
-        if (backdrop instanceof HTMLElement) {
-          backdrop.click();
-        }
-      });
-      
-      // Look for the specific container to ensure alignment
-      const container = menu.querySelector('.project-button-hamburger-menu');
-      if (container) {
-        container.appendChild(item);
-      } else {
-        menu.appendChild(item);
+    const menu = document.querySelector('.mat-mdc-menu-content');
+    if (!menu || !this.lastNotebookInfo) return;
+
+    // Check for existing button to prevent duplicates
+    const existingBtn = menu.querySelector('.gv-move-to-folder-btn') as HTMLElement;
+    if (existingBtn) {
+      // If we already injected, ensures the record class is present
+      if (!menu.classList.contains('gv-injected')) {
+        menu.classList.add('gv-injected');
       }
+
+      // If the notebook context has changed since injection, we remove and re-inject
+      if (existingBtn.dataset.notebookId !== this.lastNotebookInfo.conversationId) {
+        existingBtn.remove();
+      } else {
+        return; // Current button is correct
+      }
+    }
+
+    menu.classList.add('gv-injected');
+    
+    const item = document.createElement('button');
+    item.className = 'mat-mdc-menu-item mat-focus-indicator project-button-hamburger-menu-action gv-move-to-folder-btn';
+    item.role = 'menuitem';
+    item.dataset.notebookId = this.lastNotebookInfo.conversationId;
+    item.innerHTML = `
+      <mat-icon role="img" class="mat-icon notranslate google-symbols mat-icon-no-color" aria-hidden="true" style="margin-right: 8px;">folder</mat-icon>
+      <span class="mat-mdc-menu-item-text">Move to Folder</span>
+      <div class="mat-ripple mat-mdc-menu-ripple"></div>
+    `;
+    
+    const notebook = { ...this.lastNotebookInfo };
+    item.addEventListener('click', (e) => {
+      console.log('[NotebookLMFolderManager] Move to folder clicked for:', notebook.title);
+      e.preventDefault();
+      e.stopPropagation();
+      
+      this.showFolderPicker(notebook);
+      
+      // Close the native menu by clicking the backdrop if it exists
+      const backdrop = document.querySelector('.cdk-overlay-backdrop');
+      if (backdrop instanceof HTMLElement) {
+        backdrop.click();
+      }
+    });
+    
+    // Look for the specific container to ensure alignment
+    const container = menu.querySelector('.project-button-hamburger-menu');
+    if (container) {
+      container.appendChild(item);
+    } else {
+      menu.appendChild(item);
     }
   }
 
@@ -262,7 +279,10 @@ export class NotebookLMFolderManager {
           
           btn.addEventListener('click', async () => {
             console.log('[NotebookLMFolderManager] Target folder selected:', f.name);
-            await this.handleDrop(f.id, JSON.stringify(notebook));
+            const success = await this.handleDrop(f.id, JSON.stringify(notebook));
+            if (!success) {
+              alert(this.t('duplicate_notebook_error') || 'This notebook is already in the target folder.');
+            }
             dialog.remove();
             this.render();
           });
@@ -516,7 +536,10 @@ export class NotebookLMFolderManager {
       el.classList.remove('gv-drag-over');
       const data = e.dataTransfer?.getData('application/json');
       if (data) {
-        await this.handleDrop(folder.id, data);
+        const success = await this.handleDrop(folder.id, data);
+        if (!success) {
+          alert(this.t('duplicate_notebook_error') || 'This notebook is already in the target folder.');
+        }
         this.render();
       }
     });

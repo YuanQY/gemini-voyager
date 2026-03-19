@@ -1478,5 +1478,9 @@
   "aiOrgInstructionsBody": {
     "message": "Com base nas conversas e na estrutura de pastas acima, reorganize-as em uma hierarquia lógica de pastas. Gere um arquivo JSON no formato exato abaixo que possa ser importado diretamente na extensão Gemini Voyager (use a estratégia de importação \"Mesclar\"). Mantenha as pastas bem organizadas existentes, crie novas conforme necessário e mova as conversas não classificadas para pastas apropriadas. Cada pasta precisa de um ID único (use uma string aleatória curta) e cada conversa deve manter seu conversationId e url originais.",
     "description": "Corpo das instruções para a IA gerar uma estrutura de pastas importável"
+  },
+  "duplicate_notebook_error": {
+    "message": "Este caderno já está na pasta de destino.",
+    "description": "Error message when adding a duplicate notebook to a folder"
   }
 }

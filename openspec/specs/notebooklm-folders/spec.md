@@ -1,9 +1,8 @@
-## Requirements: NotebookLM Folder Management
-
+## Purpose
 This specification covers the implementation of folder-based organization for `notebooklm.google.com`.
-
+## Requirements
 ### Requirement: Sidebar Layout & Toggle Mechanism
-Provide a permanent navigation hub for folders while allowing users to hide it to maximize screen space.
+The system SHALL provide a permanent navigation hub for folders while allowing users to hide it to maximize screen space.
 
 #### Scenario: Sidebar Grid Injection
 - **WHEN** user visits NotebookLM
@@ -16,7 +15,7 @@ Provide a permanent navigation hub for folders while allowing users to hide it t
 - **AND** the state SHOULD be persisted to `chrome.storage.local`.
 
 ### Requirement: Folder CRUD & Nesting
-Users SHOULD be able to create and manage multi-level folder structures.
+Users SHALL be able to create and manage multi-level folder structures.
 
 #### Scenario: Folder Hierarchy
 - **GIVEN** a folder exists
@@ -29,7 +28,7 @@ Users SHOULD be able to create and manage multi-level folder structures.
 - **THEN** it MUST support: **Rename**, **Change Color**, **Delete**, and **Add Subfolder**.
 
 ### Requirement: Notebook Organization
-Enable seamless movement of notebooks into folders via drag-and-drop or explicit menus.
+The system SHALL enable seamless movement of notebooks into folders via drag-and-drop or explicit menus.
 
 #### Scenario: Advanced Drag-and-Drop
 - **WHEN** user drags a notebook over the sidebar
@@ -42,8 +41,13 @@ Enable seamless movement of notebooks into folders via drag-and-drop or explicit
 - **THEN** a "Move to Folder" button MUST be injected into the native menu.
 - **AND** clicking it MUST show a **Tree-style Folder Picker**.
 
+#### Scenario: Prevent Duplicate Addition
+- **WHEN** user attempts to add a notebook to a folder that already contains it (via Drag-and-Drop or Folder Picker)
+- **THEN** the system MUST NOT add the notebook again.
+- **AND** the system MUST show a localized informative feedback alert telling the user the item already exists in the target folder.
+
 ### Requirement: Robustness & Isolation
-Ensure features work correctly across sessions and accounts.
+The system SHALL ensure features work correctly across sessions and accounts.
 
 #### Scenario: Multi-user Auth Preservation
 - **WHEN** navigating from the sidebar
@@ -55,6 +59,8 @@ Ensure features work correctly across sessions and accounts.
 - **THEN** it MUST be scoped to the specific user email (e.g., `gvFolderDataNotebookLM:acct:{email}`).
 - **AND** the system SHOULD retry account detection during UI refreshes.
 
-### Design Pattern: Reliable Tracking (Architectural Note)
+## Design Patterns
+
+### Reliable Tracking
 - **Event Delegation**: Notebook identification uses container-level delegation for reliability after dynamic re-renders.
 - **Heuristic ID Extraction**: Identification fallbacks to `jslog` attribute parsing for improved accuracy.

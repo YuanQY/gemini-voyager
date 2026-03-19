@@ -280,6 +280,38 @@ describe('NotebookLMFolderManager', () => {
       expect(success2).toBe(false);
     });
 
+    it('shows alert when handleDrop fails (duplicate) in createFolderElement drop handler', async () => {
+      const manager = new NotebookLMFolderManager();
+      managers.push(manager);
+      await manager.createFolder('Repeat Folder');
+      const folder = (manager as any).data.folders[0];
+      
+      const el = (manager as any).createFolderElement(folder, 0);
+      
+      const dragData = { type: 'conversation', conversationId: 'dup-1', title: 'Dup' };
+      // First drop (success)
+      await (manager as any).handleDrop(folder.id, JSON.stringify(dragData));
+      
+      // Spy on alert
+      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+      
+      // Simulate drop event
+      const dropEvent = new CustomEvent('drop', { bubbles: true }) as any;
+      dropEvent.preventDefault = vi.fn();
+      dropEvent.stopPropagation = vi.fn();
+      dropEvent.dataTransfer = {
+        getData: vi.fn(() => JSON.stringify(dragData))
+      };
+      
+      el.dispatchEvent(dropEvent);
+      
+      // Wait for async handleDrop in listener
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
+      expect(alertSpy).toHaveBeenCalled();
+      alertSpy.mockRestore();
+    });
+
     it('removeFromFolder removes a notebook from a folder', async () => {
       const manager = new NotebookLMFolderManager();
       managers.push(manager);
@@ -320,6 +352,83 @@ describe('NotebookLMFolderManager', () => {
       // The project-button should have draggable="true"
       expect(projectBtn.getAttribute('draggable')).toBe('true');
       expect(div.hasAttribute('draggable')).toBe(false);
+    });
+  });
+
+  describe('Menu Action Injection', () => {
+    it('checkAndInjectMenuAction adds exactly one button', () => {
+      const manager = new NotebookLMFolderManager();
+      managers.push(manager);
+      
+      // Mock lastNotebookInfo
+      (manager as any).lastNotebookInfo = {
+        conversationId: 'notebook-id-1',
+        title: 'Notebook 1'
+      };
+      
+      // Setup mock menu DOM
+      const menu = document.createElement('div');
+      menu.className = 'mat-mdc-menu-content';
+      document.body.appendChild(menu);
+      
+      try {
+        // First injection
+        (manager as any).checkAndInjectMenuAction();
+        expect(menu.querySelectorAll('.gv-move-to-folder-btn').length).toBe(1);
+        expect(menu.classList.contains('gv-injected')).toBe(true);
+        
+        // Second injection (should NOT add another button)
+        (manager as any).checkAndInjectMenuAction();
+        expect(menu.querySelectorAll('.gv-move-to-folder-btn').length).toBe(1);
+      } finally {
+        menu.remove();
+      }
+    });
+
+    it('checkAndInjectMenuAction updates button when notebook changes', () => {
+      const manager = new NotebookLMFolderManager();
+      managers.push(manager);
+      
+      // Mock menu DOM
+      const menu = document.createElement('div');
+      menu.className = 'mat-mdc-menu-content';
+      document.body.appendChild(menu);
+      
+      try {
+        // Inject for notebook 1
+        (manager as any).lastNotebookInfo = { conversationId: 'nb-1', title: 'NB 1' };
+        (manager as any).checkAndInjectMenuAction();
+        const btn1 = menu.querySelector('.gv-move-to-folder-btn') as HTMLElement;
+        expect(btn1.dataset.notebookId).toBe('nb-1');
+        
+        // Inject for notebook 2 (on SAME menu element)
+        (manager as any).lastNotebookInfo = { conversationId: 'nb-2', title: 'NB 2' };
+        (manager as any).checkAndInjectMenuAction();
+        
+        const btn2 = menu.querySelector('.gv-move-to-folder-btn') as HTMLElement;
+        expect(menu.querySelectorAll('.gv-move-to-folder-btn').length).toBe(1);
+        expect(btn2.dataset.notebookId).toBe('nb-2');
+      } finally {
+        menu.remove();
+      }
+    });
+
+    it('restores button if gv-injected class is present but button is gone', () => {
+       const manager = new NotebookLMFolderManager();
+       managers.push(manager);
+       
+       const menu = document.createElement('div');
+       menu.className = 'mat-mdc-menu-content gv-injected'; // Already marked as injected
+       document.body.appendChild(menu);
+       
+       (manager as any).lastNotebookInfo = { conversationId: 'nb-1', title: 'NB 1' };
+       
+       try {
+         (manager as any).checkAndInjectMenuAction();
+         expect(menu.querySelector('.gv-move-to-folder-btn')).toBeTruthy();
+       } finally {
+         menu.remove();
+       }
     });
   });
 });
